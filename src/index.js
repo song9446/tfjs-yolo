@@ -42,7 +42,7 @@ async function _predict(
   inputSize,
 ) {
   let outputs = tf.tidy(() => {
-    if(image.constructor != ImageData) {
+    /*if(image.constructor != ImageData) {
       const canvas = document.createElement('canvas');
       canvas.width = inputSize;
       canvas.height = inputSize;
@@ -54,12 +54,12 @@ async function _predict(
 
       const outputs = model.predict(imageTensor);
       return outputs;
-    } else {
+    } else {*/
       let imageTensor = tf.browser.fromPixels(image, 3);
       imageTensor = imageTensor.expandDims(0).toFloat().div(tf.scalar(255));
       const outputs = model.predict(imageTensor);
       return outputs;
-    }
+    //}
   });
 
   const boxes = await postprocess(
