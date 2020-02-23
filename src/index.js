@@ -42,17 +42,24 @@ async function _predict(
   inputSize,
 ) {
   let outputs = tf.tidy(() => {
-    const canvas = document.createElement('canvas');
-    canvas.width = inputSize;
-    canvas.height = inputSize;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(image, 0, 0, inputSize, inputSize);
+    if(image.constructor != ImageData) {
+      const canvas = document.createElement('canvas');
+      canvas.width = inputSize;
+      canvas.height = inputSize;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(image, 0, 0, inputSize, inputSize);
 
-    let imageTensor = tf.browser.fromPixels(canvas, 3);
-    imageTensor = imageTensor.expandDims(0).toFloat().div(tf.scalar(255));
+      let imageTensor = tf.browser.fromPixels(canvas, 3);
+      imageTensor = imageTensor.expandDims(0).toFloat().div(tf.scalar(255));
 
-    const outputs = model.predict(imageTensor);
-    return outputs;
+      const outputs = model.predict(imageTensor);
+      return outputs;
+    } else {
+      let imageTensor = tf.browser.fromPixels(image, 3);
+      imageTensor = imageTensor.expandDims(0).toFloat().div(tf.scalar(255));
+      const outputs = model.predict(imageTensor);
+      return outputs;
+    }
   });
 
   const boxes = await postprocess(
